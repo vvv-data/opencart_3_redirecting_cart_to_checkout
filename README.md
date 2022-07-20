@@ -1,5 +1,9 @@
 # Redirect to the checkout page after clicking the "Add to Cart".
-That redirects to the checkout page after clicking the "Add to Cart" button
+Using this module, you can set up a redirect to the checkout page by clicking the "Add to Cart" button.
+You can set up a redirect for each individual product.
+You can change the name of the add to cart button.
+You can specify your page to redirect
+
 
 # Настройка переадресации на страницу заказа для увеличения конверсии
 Если на вашем сайте есть уникальные штучные товары, которые чаще всего покупают по одному, то с помощью этого модуля вы сможете настроить для них переадресацию на страницу заказа по нажатию кнопки добавления в корзину.
