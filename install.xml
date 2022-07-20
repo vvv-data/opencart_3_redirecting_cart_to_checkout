@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <name>redirecting cart to checkout</name>                
+  <code>redirecting_cart_to_checkout</code>                
+  <version>1.0</version>           
+  <author>vvvdata</author>           
+  <link>https://vvvdata.ru</link>  
+ 
+<file path="admin/model/catalog/product.php">  
+  <operation>
+    <search>                           
+      <![CDATA[
+      $product_id = $this->db->getLastId();
+      ]]>
+    </search>
+    <add position="after">             
+      <![CDATA[
+    if (isset($data['product_redirecting_checked']) && $data['product_redirecting_checked'] > 0) {
+			$result = $this->db->query("SHOW TABLES FROM `" . DB_DATABASE . "` like '" . DB_PREFIX . "product_redirect'");
+		    if($result->num_rows)
+			$this->db->query("INSERT INTO " . DB_PREFIX . "product_redirect (product_redirecting_checked, product_id, store_id) VALUES(1,'" .(int)$product_id. "', '" . (int)$store_id . "')");
+		}
+      ]]>
+    </add>
+  </operation>
+  <operation>
+    <search>                           
+      <![CDATA[public function editProduct($product_id, $data)]]>
+    </search>
+    <add position="after" offset="2">             
+      <![CDATA[
+    if (isset($data['product_redirecting_checked'])){
+			$result = $this->db->query("SHOW TABLES FROM `" . DB_DATABASE . "` like '" . DB_PREFIX . "product_redirect'");
+		    if($result->num_rows){
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_redirect WHERE store_id = '" . (int)$store_id . "' AND `product_id` = '" .(int)$product_id. "'");
+			     if ($data['product_redirecting_checked'] > 0)
+				 $this->db->query("INSERT INTO " . DB_PREFIX . "product_redirect (product_redirecting_checked, product_id, store_id) VALUES(1,'" .(int)$product_id. "', '" . (int)$store_id . "')");
+			  }
+		}
+      ]]>
+    </add>
+  </operation>
+  <operation>
+    <search>                           
+      <![CDATA[ $this->addProduct($data); ]]>
+    </search>
+    <add position="before">             
+      <![CDATA[
+    $data['product_redirecting_checked'] = $this->getProductRedirectingChecked($product_id);
+      ]]>
+    </add>
+  </operation> 
+  <operation>
+    <search>                           
+      <![CDATA[ public function deleteProduct($product_id) ]]>
+    </search>
+    <add position="after">             
+      <![CDATA[
+    $result = $this->db->query("SHOW TABLES FROM `" . DB_DATABASE . "` like '" . DB_PREFIX . "product_redirect'");
+		if($result->num_rows)
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_redirect WHERE `product_id` = '" .(int)$product_id. "'");
+      ]]>
+    </add>
+  </operation> 
+  <operation>
+    <search>                           
+      <![CDATA[ public function getTotalProductsByProfileId($recurring_id) ]]>
+    </search>
+    <add position="before">             
+      <![CDATA[
+    public function getProductRedirectingChecked($product_id) {
+		$result = $this->db->query("SHOW TABLES FROM `" . DB_DATABASE . "` like '" . DB_PREFIX . "product_redirect'");
+		  if($result->num_rows){
+			$query = $this->db->query("SELECT product_redirecting_checked FROM " . DB_PREFIX . "product_redirect WHERE `product_id` = '" .(int)$product_id. "'");
+			if ($query->num_rows && $query->row['product_redirecting_checked'] > 0) 
+			  return 1;
+      }
+			return null;
+	  }
+      ]]>
+    </add>
+  </operation>  
+</file>
+
+<file path="admin/controller/catalog/product.php">  
+  <operation>
+    <search>                           
+      <![CDATA[
+       $data['layouts'] = $this->model_design_layout->getLayouts();
+      ]]>
+    </search>
+    <add position="after">             
+      <![CDATA[
+		$this->load->model('extension/module/redirecting_cart_to_checkout');
+		$data['product_redirecting_enabled'] = $this->model_extension_module_redirecting_cart_to_checkout->Enabled();
+	    if($data['product_redirecting_enabled']){
+			$data_redirecting = $this->load->language('extension/module/redirecting_cart_to_checkout');
+			$data['redirecting_tab'] = $data_redirecting['redirecting_tab'];
+			$data['text_enabled_redirect'] = $data_redirecting['text_enabled_redirect'];
+			$data['text_disabled_redirect'] = $data_redirecting['text_disabled_redirect'];
+			$data['entry_status_redirect'] = $data_redirecting['entry_status_redirect'];
+			if(isset($this->request->get['product_id'])) $data['product_redirecting_checked'] = $this->model_catalog_product->getProductRedirectingChecked($this->request->get['product_id']);
+		} 
+      ]]>
+    </add>
+  </operation>    
+</file>
+
+<file path="admin/view/template/catalog/product_form.twig">
+  <operation>
+    <search>                          
+      <![CDATA[<li><a href="#tab-design" data-toggle="tab">{{ tab_design }}</a></li>]]>
+    </search>
+    <add position="after">             
+      <![CDATA[
+      {% if product_redirecting_enabled %}
+          <li><a href="#tab-redirect" data-toggle="tab">{{ redirecting_tab }}</a></li>
+      {% endif %}
+      ]]>
+    </add>
+  </operation> 
+  <operation>
+    <search>                          
+      <![CDATA[</form>]]>
+    </search>
+    <add position="before" offset="1">             
+      <![CDATA[
+      {% if product_redirecting_enabled %}
+            <div class="tab-pane form-group" id="tab-redirect">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status_redirect }}</label>
+            <div class="col-sm-10">
+              <select name="product_redirecting_checked" class="form-control">
+                {% if product_redirecting_checked %}
+                <option value="1" selected="selected">{{ text_enabled_redirect }}</option>
+                <option value="0">{{ text_disabled_redirect }}</option>
+                {% else %}
+                <option value="1">{{ text_enabled_redirect }}</option>
+                <option value="0" selected="selected">{{ text_disabled_redirect }}</option>
+                {% endif %}
+              </select> 
+             </div>
+           </div>
+          {% endif %}
+      ]]>
+    </add>
+  </operation> 
+</file>
+<file path="catalog/view/theme/*/template/product/product.twig">
+  <operation>
+    <search>                          
+      <![CDATA[$('.text-danger').parent().addClass('has-error');]]>
+    </search>
+    <add position="after" offset="1">             
+      <![CDATA[
+      if (json['redirect']) {
+					location = json['redirect'];
+				}
+      ]]>
+    </add>
+  </operation> 
+</file>
+<file path="catalog/view/theme/*/template/common/footer.twig">
+  <operation>
+    <search>                          
+      <![CDATA[<footer>]]>
+    </search>
+    <add position="before">             
+      <![CDATA[
+      {% if redirecting_text_button %}
+      <script>
+      let elements = document.querySelectorAll("button[onclick]");
+      if(elements.length > 0){
+         for (var i = 0; i < elements.length; i++) {
+          if(/cart\.add/.test(elements[i].getAttribute('onclick')))
+          if(elements[i].querySelector('span'))
+           elements[i].querySelector('span').innerText = "{{ redirecting_text_button }}";
+         }
+      }
+      elements = document.getElementById("button-cart");
+      if(elements)
+         elements.innerText = "{{ redirecting_text_button }}";
+      </script>
+      {% endif %}
+      ]]>
+    </add>
+  </operation> 
+</file>
+<file path="catalog/controller/common/footer.php">
+  <operation error="skip">
+    <search>                          
+      <![CDATA[return $this->load->view('common/footer', $data);]]>
+    </search>
+    <add position="before">             
+      <![CDATA[
+      $this->load->model('extension/module/redirecting_cart_to_checkout');
+		  $data['redirecting_text_button'] = $this->model_extension_module_redirecting_cart_to_checkout->GetTextButton();
+      ]]>
+    </add>
+  </operation> 
+</file>
+<file path="catalog/controller/checkout/cart.php">
+  <operation>
+    <search>                          
+      <![CDATA[$json['success'] = sprintf($this->language->get('text_success')]]>
+    </search>
+    <add position="after">             
+      <![CDATA[
+      $this->load->model('extension/module/redirecting_cart_to_checkout');
+		  $json['redirect'] = $this->model_extension_module_redirecting_cart_to_checkout->GetUrlRedirect($this->request->post['product_id']);
+      ]]>
+    </add>
+  </operation> 
+</file>
+</modification>

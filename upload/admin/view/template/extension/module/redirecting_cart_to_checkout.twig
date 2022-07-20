@@ -1,0 +1,82 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+ 
+      <!-- Кнопки управления -->
+      <div class="pull-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+      </div>
+ 
+      <!-- Название модуля -->
+      <h1>{{ heading_title }}</h1>
+ 
+      <!-- Хлебные крошки -->
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+ 
+    </div>
+  </div>
+ 
+  <div class="container-fluid">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+      <div>{{ brief_instructions }}</div>
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">          
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ text_all_label_redirect }}</label>
+            <div class="col-sm-10">
+              <select name="module_redirecting_cart_to_checkout_all" id="input-all" class="form-control">
+                {% if module_redirecting_cart_to_checkout_all %}
+                <option value="1" selected="selected">{{ text_all_enabled_redirect }}</option>
+                <option value="0">{{ text_all_disabled_redirect }}</option>
+                {% else %}
+                <option value="1">{{ text_all_enabled_redirect }}</option>
+                <option value="0" selected="selected">{{ text_all_disabled_redirect }}</option>
+                {% endif %}
+              </select>
+ 
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-button">{{ entry_text_button }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="module_redirecting_cart_to_checkout_button" value="{{ module_redirecting_cart_to_checkout_button }}" placeholder="{{ text_button_example }}" id="input-text-button" class="form-control"/>
+            </div>
+          </div> 
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-url">{{ entry_url_redirect }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="module_redirecting_cart_to_checkout_url" value="{{ module_redirecting_cart_to_checkout_url }}" placeholder="{{ checkout_url_example }}" id="input-text-url" class="form-control"/>
+            </div>
+          </div>
+          <!-- Настройка: "Статус" -->                    
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status_redirect }}</label>
+            <div class="col-sm-10">
+              <select name="module_redirecting_cart_to_checkout_status" id="input-status" class="form-control">
+                {% if module_redirecting_cart_to_checkout_status %}
+                <option value="1" selected="selected">{{ text_enabled_redirect }}</option>
+                <option value="0">{{ text_disabled_redirect }}</option>
+                {% else %}
+                <option value="1">{{ text_enabled_redirect }}</option>
+                <option value="0" selected="selected">{{ text_disabled_redirect }}</option>
+                {% endif %}
+              </select>
+ 
+            </div>
+          </div>
+ 
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}
