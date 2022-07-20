@@ -19,5 +19,8 @@ That redirects to the checkout page after clicking the "Add to Cart" button
 Для этого впишите свое название в поле. 
 ![screenshot4](https://user-images.githubusercontent.com/106067946/180058733-a6a96e8e-87f8-4c1e-896f-c77f8f2564d6.jpg)
 После этого название кнопок изменится
-
+![screenshot5](https://user-images.githubusercontent.com/106067946/180059313-677e62bc-c52e-4a19-a129-97a9ce15ebd7.jpg)
 Если не хотите менять название, оставьте поле пустым.
+
+## Вы можете указать страницу, на которую будет происходить редирект:
+
