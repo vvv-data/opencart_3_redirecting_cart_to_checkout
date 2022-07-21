@@ -3,7 +3,7 @@
   <name>redirecting cart to checkout</name>                
   <code>redirecting_cart_to_checkout</code>                
   <version>1.0</version>           
-  <author>vvvdata</author>           
+  <author>vvv-data</author>           
   <link>https://vvvdata.ru</link>  
  
 <file path="admin/model/catalog/product.php">  
