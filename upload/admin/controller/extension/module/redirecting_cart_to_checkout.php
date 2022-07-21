@@ -36,7 +36,12 @@ class ControllerExtensionModuleRedirectingCartToCheckout extends Controller {
 	  $data['column_left'] = $this->load->controller('common/column_left');
 	  $data['footer'] = $this->load->controller('common/footer');
 
-	  $data['checkout_url_example'] = str_replace("admin/", "", $this->url->link('checkout/checkout'));
+	  if(HTTPS_CATALOG)
+	     $data['checkout_url_example'] = HTTPS_CATALOG."index.php?route=checkout/checkout";  
+      elseif(HTTP_CATALOG)
+	    $data['checkout_url_example'] = HTTP_CATALOG."index.php?route=checkout/checkout";
+	  else $data['checkout_url_example'] = '';
+	   
    
 	  	  $this->response->setOutput($this->load->view('extension/module/redirecting_cart_to_checkout', $data));
    
